@@ -1,0 +1,37 @@
+import type { AppRouteModule } from '@/router/types';
+
+import { LAYOUT } from '@/router/constant';
+import { t } from '@/hooks/web/useI18n';
+
+const dashboard: AppRouteModule = {
+  path: '/system',
+  name: 'System',
+  component: LAYOUT,
+  redirect: '/system/project',
+  meta: {
+    orderNo: 10,
+    icon: 'ion:grid-outline',
+    title: t('routes.system.admin'),
+  },
+  children: [
+    {
+      path: 'project',
+      name: 'Analysis',
+      component: () => import('@/views/system/project/index.vue'),
+      meta: {
+        // affix: true,
+        title: t('routes.system.project'),
+      },
+    },
+    {
+      path: 'tenant',
+      name: 'Tenant',
+      component: () => import('@/views/system/tenant/index.vue'),
+      meta: {
+        title: t('routes.system.tenant'),
+      },
+    },
+  ],
+};
+
+export default dashboard;

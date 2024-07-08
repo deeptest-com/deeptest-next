@@ -38,9 +38,20 @@ export const LoginRoute: AppRouteRecordRaw = {
   },
 };
 
+export const AibotRoute: AppRouteRecordRaw = {
+  path: '/aibot',
+  name: 'Aibot',
+  component: () => import('@/views/aibot/index.vue'),
+  meta: {
+    title: t('routes.basic.aibot'),
+    ignoreAuth: true,
+  },
+};
+
 // Basic routing without permission
 // 未经许可的基本路由
 export const basicRoutes = [
+  AibotRoute,
   LoginRoute,
   RootRoute,
   ...mainOutRoutes,

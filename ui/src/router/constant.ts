@@ -11,6 +11,8 @@ export const EXCEPTION_COMPONENT = () => import('@/views/sys/exception/Exception
  */
 export const LAYOUT = () => import('@/layouts/default/index.vue');
 
+export const LAYOUT_MANAGEMENT = () => import('@/layouts/management/index.vue');
+
 /**
  * @description: parent-layout
  */

@@ -5,6 +5,7 @@ import { uniq } from 'lodash-es';
 import { getAllParentPath } from '@/router/helper/menuHelper';
 import { useTimeoutFn } from '@vben/hooks';
 import { useDebounceFn } from '@vueuse/core';
+import {DefaultOpenMenu} from "@/settings/menuSettings";
 
 export function useOpenKeys(
   menuState: MenuState,
@@ -32,6 +33,8 @@ export function useOpenKeys(
         menuState.openNames = keys;
       }
       menuState.activeSubMenuNames = menuState.openNames;
+
+      menuState.openNames = uniq([...menuState.openNames, ...DefaultOpenMenu]);
     };
     if (native) {
       handle();
