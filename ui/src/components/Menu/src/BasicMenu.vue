@@ -56,7 +56,6 @@
   const { getCollapsed, getTopMenuAlign, getSplit } = useMenuSetting();
 
   const { currentRoute } = useRouter();
-
   const { handleOpenChange, setOpenKeys, getOpenKeys } = useOpenKeys(
     menuState,
     items,
