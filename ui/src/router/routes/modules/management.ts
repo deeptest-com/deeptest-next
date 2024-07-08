@@ -3,7 +3,7 @@ import type { AppRouteModule } from '@/router/types';
 import {LAYOUT_MANAGEMENT} from '@/router/constant';
 import { t } from '@/hooks/web/useI18n';
 
-const dashboard: AppRouteModule = {
+const management: AppRouteModule = {
   path: '/management',
   name: 'Management',
   component: LAYOUT_MANAGEMENT,
@@ -42,4 +42,4 @@ const dashboard: AppRouteModule = {
   ],
 };
 
-export default dashboard;
+export default management;

@@ -3,7 +3,7 @@ import type { AppRouteModule } from '@/router/types';
 import { LAYOUT } from '@/router/constant';
 import { t } from '@/hooks/web/useI18n';
 
-const dashboard: AppRouteModule = {
+const system: AppRouteModule = {
   path: '/system',
   name: 'System',
   component: LAYOUT,
@@ -16,7 +16,7 @@ const dashboard: AppRouteModule = {
   children: [
     {
       path: 'project',
-      name: 'Analysis',
+      name: 'Project',
       component: () => import('@/views/system/project/index.vue'),
       meta: {
         // affix: true,
@@ -34,4 +34,4 @@ const dashboard: AppRouteModule = {
   ],
 };
 
-export default dashboard;
+export default system;
