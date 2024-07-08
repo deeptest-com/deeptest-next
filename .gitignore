@@ -1,0 +1,7 @@
+.DS_Store
+.idea/
+deeptest.db
+/logs/
+/dist/
+/config/
+/ui/node_modules/
