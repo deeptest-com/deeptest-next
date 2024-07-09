@@ -32,6 +32,8 @@ var CONFIG = Web{
 		Addr:       "127.0.0.1:8085",
 		DbType:     "mysql",
 		TimeFormat: "2006-01-02 15:04:05",
+
+		ChatchatUrl: "http://192.168.5.134:7861/",
 	},
 	Limit: Limit{
 		Disable: true,
@@ -87,6 +89,8 @@ type System struct {
 	WebPrefix    string `mapstructure:"web-prefix" json:"web-prefix" yaml:"web-prefix"`
 	DbType       string `mapstructure:"db-type" json:"db-type" yaml:"db-type"`
 	TimeFormat   string `mapstructure:"time-format" json:"time-format" yaml:"time-format"`
+
+	ChatchatUrl string `mapstructure:"chatchat-url" json:"chatchat-url" yaml:"chatchat-url"`
 }
 
 // SetDefaultAddrAndTimeFormat

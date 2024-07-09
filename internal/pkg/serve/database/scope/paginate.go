@@ -1,7 +1,7 @@
 package scope
 
 import (
-	"github.com/deeptest-com/deeptest-next/internal/pkg/vendors/helper/str"
+	_str "github.com/deeptest-com/deeptest-next/pkg/libs/string"
 	"gorm.io/gorm"
 )
 
@@ -51,5 +51,5 @@ func getOrderBy(sort, orderBy string) string {
 	if orderBy == "" {
 		orderBy = "created_at"
 	}
-	return str.Join(orderBy, " ", sort)
+	return _str.Join(orderBy, " ", sort)
 }

@@ -16,7 +16,7 @@ import (
 
 // InitRouter
 func (ws *WebServer) InitRouter() error {
-	app := ws.app.Party("/").AllowMethods(iris.MethodOptions)
+	app := ws.App.Party("/").AllowMethods(iris.MethodOptions)
 	{
 		app.Get("/v0/version", func(ctx iris.Context) {
 			ctx.WriteString("IRIS-ADMIN is running!!!")
@@ -45,7 +45,7 @@ func (ws *WebServer) InitRouter() error {
 	}
 
 	// http test must build
-	if err := ws.app.Build(); err != nil {
+	if err := ws.App.Build(); err != nil {
 		return err
 	}
 
@@ -58,11 +58,11 @@ func (ws *WebServer) InitRouter() error {
 func (ws *WebServer) GetSources() ([]map[string]string, []map[string]string) {
 	methodExcepts := strings.Split(web.CONFIG.Except.Method, ";")
 	uris := strings.Split(web.CONFIG.Except.Uri, ";")
-	routeLen := len(ws.app.GetRoutes())
+	routeLen := len(ws.App.GetRoutes())
 	permRoutes := make([]map[string]string, 0, routeLen)
 	noPermRoutes := make([]map[string]string, 0, routeLen)
 
-	for _, r := range ws.app.GetRoutes() {
+	for _, r := range ws.App.GetRoutes() {
 		route := map[string]string{
 			"path": r.Path,
 			"name": r.Name,

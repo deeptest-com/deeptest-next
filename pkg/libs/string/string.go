@@ -3,6 +3,7 @@ package _str
 import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"strconv"
 	"strings"
 )
 
@@ -31,4 +32,12 @@ func Join(strs ...string) string {
 		builder.WriteString(str)
 	}
 	return builder.String()
+}
+
+func UnescapeUnicode(raw []byte) ([]byte, error) {
+	str, err := strconv.Unquote(strings.Replace(strconv.Quote(string(raw)), `\\u`, `\u`, -1))
+	if err != nil {
+		return nil, err
+	}
+	return []byte(str), nil
 }

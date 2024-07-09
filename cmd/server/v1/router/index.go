@@ -10,6 +10,8 @@ type IndexModule struct {
 	PermModule    *PermModule    `inject:""`
 	RoleModule    *RoleModule    `inject:""`
 	UserModule    *UserModule    `inject:""`
+
+	AibotModule *AibotModule `inject:""`
 }
 
 func NewIndexModule() *IndexModule {
@@ -23,5 +25,7 @@ func (m *IndexModule) ApiParty() func(rbac iris.Party) {
 		rbac.PartyFunc("/roles", m.RoleModule.Party())
 		rbac.PartyFunc("/perms", m.PermModule.Party())
 		rbac.PartyFunc("/users", m.UserModule.Party())
+
+		rbac.PartyFunc("/aichat", m.AibotModule.Party())
 	}
 }

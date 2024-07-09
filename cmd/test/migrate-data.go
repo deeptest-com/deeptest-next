@@ -21,6 +21,7 @@ import (
 	"github.com/deeptest-com/deeptest-next/cmd/server/v1/router"
 	"github.com/deeptest-com/deeptest-next/internal/pkg/consts"
 	"github.com/deeptest-com/deeptest-next/internal/pkg/core/migration"
+	"github.com/deeptest-com/deeptest-next/internal/pkg/inits"
 	"github.com/deeptest-com/deeptest-next/internal/pkg/serve/web"
 	"github.com/deeptest-com/deeptest-next/internal/pkg/serve/web/web_iris"
 	"github.com/deeptest-com/deeptest-next/internal/pkg/serve/zap_server"

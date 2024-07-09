@@ -18,14 +18,14 @@ import (
 var ErrAuthDriverEmpty = errors.New("auth driver initialize fail")
 
 // WebServer
-// - app iris application
+// - App iris application
 // - idleConnsClosed
 // - addr
 // - timeFormat
 // - staticPrefix
 
 type WebServer struct {
-	app             *iris.Application
+	App             *iris.Application
 	idleConnsClosed chan struct{}
 	parties         []Party
 	addr            string
@@ -48,6 +48,7 @@ func Init() *WebServer {
 	}
 
 	app.Use(recover.New())
+
 	app.Validator = validator.New()
 	app.Logger().SetLevel(web.CONFIG.System.Level)
 	idleConnsClosed := make(chan struct{})
@@ -63,7 +64,7 @@ func Init() *WebServer {
 	web.SetDefaultAddrAndTimeFormat()
 
 	return &WebServer{
-		app:             app,
+		App:             app,
 		addr:            web.CONFIG.System.Addr,
 		timeFormat:      web.CONFIG.System.TimeFormat,
 		idleConnsClosed: idleConnsClosed,
@@ -72,7 +73,7 @@ func Init() *WebServer {
 
 // GetEngine
 func (ws *WebServer) GetEngine() *iris.Application {
-	return ws.app
+	return ws.App
 }
 
 // AddModule
@@ -96,20 +97,20 @@ func (ws *WebServer) AddWebStatic(staticAbsPath, webPrefix string, paths ...stri
 		IndexName: "index.html",
 		SPA:       true,
 	}
-	ws.app.HandleDir(webPrefix, fsOrDir, opt)
+	ws.App.HandleDir(webPrefix, fsOrDir, opt)
 	web.CONFIG.System.WebPrefix = _str.Join(web.CONFIG.System.WebPrefix, ",", webPrefix)
 }
 
 // AddUploadStatic
 func (ws *WebServer) AddUploadStatic(webPrefix, staticAbsPath string) {
 	fsOrDir := iris.Dir(staticAbsPath)
-	ws.app.HandleDir(webPrefix, fsOrDir)
+	ws.App.HandleDir(webPrefix, fsOrDir)
 	web.CONFIG.System.StaticPrefix = webPrefix
 }
 
 // Run
 func (ws *WebServer) Run() {
-	ws.app.Listen(
+	ws.App.Listen(
 		ws.addr,
 		iris.WithoutInterruptHandler,
 		iris.WithoutServerError(iris.ErrServerClosed),
