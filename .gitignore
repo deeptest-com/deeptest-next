@@ -1,7 +1,7 @@
 .DS_Store
 .idea/
-deeptest.db
-/logs/
-/dist/
-/config/
 */**/node_modules/
+/dist/
+/logs/
+/config/
+deeptest.db
