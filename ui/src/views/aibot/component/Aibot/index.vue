@@ -16,7 +16,7 @@
 
         <div class="label">知识库</div>
         <div class="contrl">
-          <div class="select-wrapper">{{kb}}
+          <div class="select-wrapper">
             <select v-model="kb" class="select">
               <option v-for="option in aiKbs" :key="option.kb_name" :value="option.kb_name">
                 {{ option.kb_name }}
@@ -71,7 +71,7 @@
       </div>
 
       <div class="sender">
-        <input id="msgInput" class="input"
+        <input id="msgInput" class="input" autocomplete="off"
                v-model="msg"
                @keydown="keyDown"
                @keyup.enter="send" />
@@ -322,9 +322,6 @@ const initAiData = async () => {
   console.log('list_knowledge_bases', kbsResp)
   if (kbsResp.code === 0)
     aiKbs.value = kbsResp.data
-    if (aiKbs.value.length > 0) {
-      kb.value = aiKbs.value[0].kb_name
-    }
 }
 
 const initHistory = async () => {

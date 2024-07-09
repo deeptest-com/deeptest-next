@@ -10,6 +10,7 @@ import (
 	_domain "github.com/deeptest-com/deeptest-next/pkg/domain"
 	_http "github.com/deeptest-com/deeptest-next/pkg/libs/http"
 	"github.com/kataras/iris/v12"
+	"io"
 	"net/http"
 	"strings"
 )
@@ -51,8 +52,8 @@ func (s *AibotService) KnowledgeBaseChat(req v1.KnowledgeBaseChatReq, flusher ht
 
 	request.Header.Set("Cache-Control", "no-cache")
 	request.Header.Set("Accept", "text/event-stream")
-	request.Header.Set("Connection", "keep-alive")
 	request.Header.Set("Content-Type", "application/json")
+	//request.Header.Set("Connection", "keep-alive")
 
 	client := &http.Client{}
 	transport := &http.Transport{}
@@ -64,19 +65,33 @@ func (s *AibotService) KnowledgeBaseChat(req v1.KnowledgeBaseChatReq, flusher ht
 		return
 	}
 
+	gotResp := false
+
 	r := bufio.NewReader(resp.Body)
+	defer resp.Body.Close()
 	for {
-		line, err := r.ReadSlice('\n')
-		if err != nil {
-			break
+		line, err1 := r.ReadSlice('\n')
+		str := string(line)
+
+		if err1 != nil && err1 != io.EOF {
+			err = err1
+			return
 		}
-		fmt.Println("\n>>>" + string(line) + "\n")
+
+		if strings.Index(str, "data:") == 0 {
+			gotResp = true
+		}
+
+		fmt.Println("\n>>>" + str + "\n")
 
 		// must with prefix "data:" which is from openai response msg,
 		// must add a postfix "\n\n"
-		ctx.Writef("%s\n\n", string(line))
-
+		ctx.Writef("%s\n\n", str)
 		flusher.Flush()
+
+		if err1 == io.EOF || (gotResp && strings.Index(str, ": ping") == 0) {
+			break
+		}
 	}
 
 	return
