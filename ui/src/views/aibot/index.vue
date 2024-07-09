@@ -1,6 +1,6 @@
 <template>
   <div class="aibot-main">
-    <Aibot serverUrl="http://127.0.0.1:8085/">
+    <Aibot serverUrl="http://127.0.0.1:8085/" kb="wiki">
       <template #actions>
           <span class="icon-container" title="帮助">
             <span class="help icon dp-link"></span>

@@ -16,7 +16,7 @@
 
         <div class="label">知识库</div>
         <div class="contrl">
-          <div class="select-wrapper">
+          <div class="select-wrapper">{{kb}}
             <select v-model="kb" class="select">
               <option v-for="option in aiKbs" :key="option.kb_name" :value="option.kb_name">
                 {{ option.kb_name }}
@@ -108,6 +108,11 @@ const props = defineProps({
     default: '', // will use the first llm in chatchat server if empty
     required: false,
   },
+  kb: {
+    type: String,
+    default: 'wiki',
+    required: true,
+  },
   serverUrl: {
     type: String,
     default: 'http://192.168.5.134:8085/',
@@ -123,7 +128,7 @@ const histories = ref([] as any[])
 const historyIndex = ref(-1)
 
 const aiKbs = ref([] as any[])
-const kb = ref('')
+const kb = ref(props.kb)
 const msg = ref('')
 
 const messages = ref([] as any[])
@@ -179,7 +184,7 @@ const send = async () => {
 
   const data = {
     "messages": [
-      {"role": "user", "content": msg.value}
+      {"role": "user", "content": "请使用html格式返回结果"}
     ],
     "model": props.llm,
     "tool_choice": "search_local_knowledgebase",

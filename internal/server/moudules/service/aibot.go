@@ -1,6 +1,7 @@
 package service
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -51,26 +52,26 @@ func (s *AibotService) KnowledgeBaseChat(req v1.KnowledgeBaseChatReq, flusher ht
 	request.Header.Set("Cache-Control", "no-cache")
 	request.Header.Set("Accept", "text/event-stream")
 	request.Header.Set("Connection", "keep-alive")
+	request.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}
+	transport := &http.Transport{}
+	transport.DisableCompression = true
+	client.Transport = transport
+
 	resp, err := client.Do(request)
 	if err != nil {
 		return
 	}
 
+	r := bufio.NewReader(resp.Body)
 	for {
-		data := make([]byte, 1024)
-
-		_, err1 := resp.Body.Read(data)
-		if err1 != nil {
-			break
-		}
-
-		fmt.Println("\n>>> \n" + strings.TrimSpace(string(data)) + "\n<<<\n")
+		line, _ := r.ReadSlice('\n')
+		fmt.Println("\n>>>" + string(line) + "\n")
 
 		// must with prefix "data:" which is from openai response msg,
 		// must add a postfix "\n\n"
-		ctx.Writef("%s\n\n", string(data))
+		ctx.Writef("%s\n\n", string(line))
 
 		flusher.Flush()
 	}
