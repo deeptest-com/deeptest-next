@@ -3,6 +3,7 @@ package service
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	v1 "github.com/deeptest-com/deeptest-next/cmd/server/v1/domain"
 	"github.com/deeptest-com/deeptest-next/internal/pkg/serve/web"
 	_domain "github.com/deeptest-com/deeptest-next/pkg/domain"
@@ -59,10 +60,13 @@ func (s *AibotService) KnowledgeBaseChat(req v1.KnowledgeBaseChatReq, flusher ht
 
 	for {
 		data := make([]byte, 1024)
+
 		_, err1 := resp.Body.Read(data)
 		if err1 != nil {
 			break
 		}
+
+		fmt.Println("\n>>> \n" + strings.TrimSpace(string(data)) + "\n<<<\n")
 
 		// must with prefix "data:" which is from openai response msg,
 		// must add a postfix "\n\n"

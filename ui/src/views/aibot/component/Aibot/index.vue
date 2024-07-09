@@ -209,27 +209,29 @@ const send = async () => {
       console.log('onmessage', msg)
 
       if (msg.data) {
-        try {
-          const jsn = JSON.parse(msg.data)
-          if (jsn.choices) {
-            for (let i = 0; i < jsn.choices.length; i++) {
-              const content = jsn.choices[i].delta.content
-              console.log('111111', content)
+        console.log('111111', msg.data)
 
-              currMsg.value += content
-              currMsg.value = markToHtml(currMsg.value)
-            }
-
-          } else {
-            console.log('222222', jsn)
-            // currMsg.value += '<br />' + docToHtml(jsn.docs[0].trim())
-          }
-
-          currMsg.value = urlToLink(currMsg.value)
-        }
-        catch(err) {
-          console.log('parse failed', msg.data)
-        }
+        // try {
+        //   const jsn = JSON.parse(msg.data)
+        //   if (jsn.choices) {
+        //     for (let i = 0; i < jsn.choices.length; i++) {
+        //       const content = jsn.choices[i].delta.content
+        //       console.log('111111', content)
+        //
+        //       currMsg.value += content
+        //       currMsg.value = markToHtml(currMsg.value)
+        //     }
+        //
+        //   } else {
+        //     console.log('222222', jsn)
+        //     // currMsg.value += '<br />' + docToHtml(jsn.docs[0].trim())
+        //   }
+        //
+        //   currMsg.value = urlToLink(currMsg.value)
+        // }
+        // catch(err) {
+        //   console.log('parse failed', msg.data)
+        // }
       }
     },
 
