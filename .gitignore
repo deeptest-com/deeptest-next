@@ -4,4 +4,4 @@ deeptest.db
 /logs/
 /dist/
 /config/
-/ui/node_modules/
+*/**/node_modules/
