@@ -66,7 +66,10 @@ func (s *AibotService) KnowledgeBaseChat(req v1.KnowledgeBaseChatReq, flusher ht
 
 	r := bufio.NewReader(resp.Body)
 	for {
-		line, _ := r.ReadSlice('\n')
+		line, err := r.ReadSlice('\n')
+		if err != nil {
+			break
+		}
 		fmt.Println("\n>>>" + string(line) + "\n")
 
 		// must with prefix "data:" which is from openai response msg,
