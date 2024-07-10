@@ -9,7 +9,7 @@ on:
 
 jobs:
   build-and-deploy:
-    runs-on: runner-next
+    runs-on: Linux
     defaults:
       run:
         working-directory: ~/rd/project/deeptest-next
