@@ -1,0 +1,10 @@
+.DS_Store
+.idea/
+ui/internal/**/dist/
+**/node_modules/
+dist/
+ui/dist/
+bin/
+/logs/
+/config/
+deeptest.db
