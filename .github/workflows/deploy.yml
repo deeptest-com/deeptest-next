@@ -7,12 +7,15 @@ on:
   # push:
   #   branches: [ "main" ]
 
+env:
+  WORK_DIR: /home/nancal/rd/project/deeptest-next/
+
 jobs:
   build-and-deploy:
-    runs-on: runner-next
+    runs-on: Linux
     defaults:
       run:
-        working-directory: ~/rd/project/deeptest-next
+        working-directory: /home/nancal/rd/project/deeptest-next
     steps:
       - name: checkout codes
         run: git pull
@@ -25,14 +28,14 @@ jobs:
 
       - name: copy files
         run:  |
-          mkdir -p ~/rd/server-next
-          cp -f bin/linux/deeptest-server ~/rd/server-next/
+          mkdir -p /home/nancal/rd/server-next
+          cp -f bin/linux/deeptest-server /home/nancal/rd/server-next/
           
-          rm -rf ~/rd/server-next/deeptest-ui
-          cp -fr ui/dist ~/rd/server-next/deeptest-ui
+          rm -rf /home/nancal/rd/server-next/deeptest-ui
+          cp -fr ui/dist /home/nancal/rd/server-next/deeptest-ui
           
       - name: start service
         run:  |
           ps -ef | grep 'deeptest-server-next' | grep -v grep | awk '{print $2}' | xargs --no-run-if-empty kill -9
-          cd ~/rd/server-next
+          cd /home/nancal/rd/server-next
           RUNNER_TRACKING_ID="" && nohup ./deeptest-server > server.log 2>&1 &
