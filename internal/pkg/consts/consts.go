@@ -5,6 +5,7 @@ import "errors"
 const (
 	ConfigType     = "json"
 	CasbinFileName = "rbac_model.conf"
+	DirUpload      = "upload"
 )
 
 var (

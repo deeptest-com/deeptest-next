@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"github.com/deeptest-com/deeptest-next/cmd/server/serve"
 	"github.com/deeptest-com/deeptest-next/cmd/server/v1/router"
 	"github.com/deeptest-com/deeptest-next/internal/pkg/consts"
 	"github.com/deeptest-com/deeptest-next/internal/pkg/core/auth"
@@ -18,7 +19,6 @@ import (
 	"github.com/facebookgo/inject"
 	"github.com/sirupsen/logrus"
 	"os"
-	"path/filepath"
 )
 
 var (
@@ -36,7 +36,7 @@ func main() {
 	inits.Init()
 
 	webServer := web_iris.Init()
-	webServer.AddWebStatic(filepath.Join(consts.ExecDir, "ui"), "/ui")
+	serve.AddStatic(webServer.App)
 
 	cache.Init()
 	err := auth.InitDriver(&auth.Config{
