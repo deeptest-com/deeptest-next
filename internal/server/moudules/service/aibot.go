@@ -90,7 +90,11 @@ func (s *AibotService) KnowledgeBaseChat(req v1.KnowledgeBaseChatReq, flusher ht
 		flusher.Flush()
 
 		if err1 == io.EOF || (gotResp && strings.Index(str, ": ping") == 0) {
-			break
+			str := s.genResp("__BREAK__")
+
+			ctx.Writef("%s\n\n", str)
+			flusher.Flush()
+			return
 		}
 	}
 

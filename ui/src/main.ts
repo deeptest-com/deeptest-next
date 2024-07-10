@@ -17,9 +17,11 @@ import { setupRouterGuard } from '@/router/guard';
 import { setupStore } from '@/store';
 
 import App from './App.vue';
+import Markdown from 'vue3-markdown-it';
 
 async function bootstrap() {
   const app = createApp(App);
+  app.use(Markdown);
 
   // Configure store
   // 配置 store

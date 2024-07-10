@@ -40,6 +40,9 @@
 
             <div class="content">
               <span>{{item.content}}</span>
+
+              <span>{{item.doc}}</span>
+
               <span v-if="index === messages.length - 1"
                     class="loading">
                 <img src="@/assets/images/chat-loading.gif" />
@@ -51,8 +54,11 @@
             <div class="avatar-container">
               <div class="avatar"></div>
             </div>
-            <div class="content">
-              <span v-html="item.content" />
+
+            <a href="http://baidu.com">9999</a>
+
+            <div class="content markdown-container">
+              <Markdown :source="item.content" :linkify="true" :html="true" />
             </div>
             <div class="toolbar">
               <div class="call dp-link-primary"
@@ -76,8 +82,9 @@
                @keydown="keyDown"
                @keyup.enter="send" />
 
-        <span class="button dp-link"
+        <span v-if="!isLoading" class="button dp-link"
               @click="send" />
+        <span v-if="isLoading" class="button" />
       </div>
 
       <div class="actions">
@@ -88,16 +95,21 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, ref, watch} from "vue";
+import {onMounted, onBeforeUnmount, ref} from "vue";
 import {fetchEventSource} from '@microsoft/fetch-event-source';
+import MarkdownItStrikethroughAlt from 'markdown-it-strikethrough-alt';
+import Markdown from 'vue3-markdown-it';
 import {notifySuccess} from "@/utils/notify";
 import {getCache, setCache} from "@/utils/localCache";
 import {
-  markToHtml,
-  docToHtml,
   urlToLink,
   scroll,
-  setSelectionRange, list_knowledge_bases
+  setSelectionRange,
+  list_knowledge_bases,
+  getDocLink,
+  getDocDesc,
+  replaceLinkWithoutTitle,
+  isUnderRobotMsg
 } from "./service";
 import consts from "@/config/constant";
 import {addSepIfNeeded} from "@/utils/http/url";
@@ -120,6 +132,8 @@ const props = defineProps({
   },
 });
 
+const wikiAddress = 'https://wiki.nancalcloud.com'
+const wakeUpWord = '小乐'
 const humanName = 'Albert'
 const humanAvatar = '../../../../assets/images/chat-einstein.png'
 
@@ -130,12 +144,13 @@ const historyIndex = ref(-1)
 const aiKbs = ref([] as any[])
 const kb = ref(props.kb)
 const msg = ref('')
+const isLoading = ref(false)
 
 const messages = ref([] as any[])
 messages.value.push({
   type: 'human',
   name: humanName,
-  content: '小乐',
+  content: wakeUpWord,
   avatar: humanAvatar,
 })
 messages.value.push({
@@ -146,7 +161,6 @@ messages.value.push({
 scroll()
 
 const isChatting = ref(false)
-const currMsg = ref('')
 const send = async () => {
   console.log('send')
   msg.value = msg.value.trim()
@@ -159,13 +173,13 @@ const send = async () => {
 
   if (histories.value.length >= 30) histories.value = histories.value.splice(0,1)
 
-  histories.value.push(''+msg.value)
-  historyIndex.value = histories.value.length
-
-  await setCache(CHAT_HISTORIES, histories.value)
+  if (''+msg.value !== wakeUpWord) {
+    histories.value.push(''+msg.value)
+    historyIndex.value = histories.value.length
+    setCache(CHAT_HISTORIES, histories.value)
+  }
 
   isChatting.value = true
-  currMsg.value = ''
 
   const humanMsg = {
     type: 'human',
@@ -184,7 +198,7 @@ const send = async () => {
 
   const data = {
     "messages": [
-      {"role": "user", "content": "请使用html格式返回结果"}
+      {"role": "user", "content": "请使用markdown格式返回结果"}
     ],
     "model": props.llm,
     "tool_choice": "search_local_knowledgebase",
@@ -192,6 +206,7 @@ const send = async () => {
     "stream": true
   }
 
+  isLoading.value = true
   await fetchEventSource(url, {
     method: 'POST',
     headers: {
@@ -214,43 +229,68 @@ const send = async () => {
       console.log('onmessage', msg)
 
       if (msg.data) {
-        console.log('111111', msg.data)
+        let jsn = {} as any
+        try {
+          jsn = JSON.parse(msg.data)
+        } catch(err) {
+          console.log('parse chatchat msg failed', msg.data)
+          return
+        }
 
-        // try {
-        //   const jsn = JSON.parse(msg.data)
-        //   if (jsn.choices) {
-        //     for (let i = 0; i < jsn.choices.length; i++) {
-        //       const content = jsn.choices[i].delta.content
-        //       console.log('111111', content)
-        //
-        //       currMsg.value += content
-        //       currMsg.value = markToHtml(currMsg.value)
-        //     }
-        //
-        //   } else {
-        //     console.log('222222', jsn)
-        //     // currMsg.value += '<br />' + docToHtml(jsn.docs[0].trim())
-        //   }
-        //
-        //   currMsg.value = urlToLink(currMsg.value)
-        // }
-        // catch(err) {
-        //   console.log('parse failed', msg.data)
-        // }
+        const doc_contents = [] as any[]
+        let msg_content = ''
+
+        // docs
+        if (jsn.tool_output?.docs && jsn.tool_output?.docs.length > 0) {
+          jsn.tool_output?.docs.forEach((doc) => {
+            if (doc.page_content) {
+              let doc_content = getDocDesc(doc.page_content.trim())
+
+              const {pageId, pageType} = getDocLink(doc.metadata.source)
+              if (pageType === 'html') { // is link
+                doc_content =
+                  `[${doc_content}](${wikiAddress}/pages/viewpage.action?pageId=${pageId})`
+              }
+
+              doc_contents.push(doc_content)
+            }
+          })
+        }
+
+        // msgs
+        if (jsn.choices && jsn.choices.length > 0) {
+          jsn.choices?.forEach((choice) => {
+            if (choice.delta?.content && choice.delta?.content !== '__BREAK__') {
+              msg_content += choice.delta?.content?.trim()
+              msg_content = urlToLink(msg_content)
+            }
+          })
+        }
+
+        const robotMsg = {
+          type: 'robot',
+          name: humanName,
+          content: msg_content + '  \n\n' + (doc_contents.length > 0 ? '  \n出处：\n1. ' + doc_contents.join('  \n1.  ') : ''),
+          avatar: humanAvatar,
+        }
+        robotMsg.content = replaceLinkWithoutTitle(robotMsg.content)
+        console.log('!!!!!!', robotMsg)
+        messages.value.push(robotMsg )
+
+        scroll()
+        isLoading.value = false
       }
     },
 
     onclose() {
       console.log('onclose')
       isChatting.value = false
-      currMsg.value = ''
 
       msg.value = ''
     },
     onerror(err) {
       console.log('onerror', err)
       isChatting.value = false
-      currMsg.value = ''
     }
   });
 }
@@ -298,23 +338,6 @@ const keyDown = (event) => {
   }
 }
 
-watch(currMsg, (newVal, oldValue) => {
-  if (!oldValue && newVal) {
-    const robotMsg = {
-      type: 'robot',
-      name: humanName,
-      content: newVal,
-      avatar: humanAvatar,
-    }
-    messages.value.push(robotMsg)
-
-  } else if (newVal && messages.value[messages.value.length - 1].type === 'robot') {
-    messages.value[messages.value.length - 1].content =  newVal
-  }
-
-  scroll()
-}, {immediate: false, deep: true})
-
 const initAiData = async () => {
   const serverUrl = addSepIfNeeded(props.serverUrl) + 'api/v1'
 
@@ -357,9 +380,28 @@ const copy = () => {
   notifySuccess('成功复制回复结果到剪贴板。');
 }
 
+const handleLinkClick = (event) => {
+  console.log('handleLinkClick')
+
+  const target = event.target
+
+  if (target.tagName.toLowerCase() === 'a' && target.getAttribute('href')) {
+    if (!isUnderRobotMsg(target)) return true
+
+    event.preventDefault();
+
+    const href = target.getAttribute('href');
+    window.open(href, '_blank');
+  }
+}
+
 onMounted(async () => {
   initHistory()
   initAiData()
+  document.addEventListener('click', handleLinkClick)
+})
+onBeforeUnmount(async () => {
+  document.removeEventListener('click', handleLinkClick)
 })
 
 </script>
@@ -545,6 +587,7 @@ onMounted(async () => {
         &.robot .content {
           background-color: white;
           padding-left: 14px;
+          line-height: 26px;
         }
         &.human .content {
           .loading {
