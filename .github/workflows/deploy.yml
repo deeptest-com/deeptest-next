@@ -9,7 +9,7 @@ on:
 
 jobs:
   build-and-deploy:
-    runs-on: nancal
+    runs-on: runner-next
     defaults:
       run:
         working-directory: ~/rd/project/deeptest-next
