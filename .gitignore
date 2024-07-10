@@ -1,7 +1,7 @@
 .DS_Store
 .idea/
 ui/internal/**/dist/
-ui/**/.turbo/
+ui/internal/**/.turbo/
 **/node_modules/
 dist/
 /ui/dist/
