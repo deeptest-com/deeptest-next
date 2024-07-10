@@ -55,8 +55,6 @@
               <div class="avatar"></div>
             </div>
 
-            <a href="http://baidu.com">9999</a>
-
             <div class="content markdown-container">
               <Markdown :source="item.content" :linkify="true" :html="true" />
             </div>
