@@ -48,7 +48,7 @@ gen_version_file:
 	@echo '{"version": "${VERSION}"}' > ${QINIU_DIR}/${PROJECT}/version.json
 
 compile_ui:
-	@cd ui && pnpm build --dest dist && cd ..
+	@nvm use v20.15.1 && cd ui && pnpm build --dest dist && cd ..
 
 # server
 compile_server_win64:
