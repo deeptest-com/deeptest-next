@@ -1,0 +1,1 @@
+import{_ as e}from"./entry/index-DAalq45t.js";import{_ as t,$ as o}from"./vue-CcYFxcV9.js";import"./antd-Dz9J5sbH.js";const c={},r={class:"m-10 auth-page"};function a(s,_){return t(),o("div",r,"Super 角色可见")}const m=e(c,[["render",a],["__scopeId","data-v-94f9eb17"]]);export{m as default};

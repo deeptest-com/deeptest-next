@@ -1,0 +1,1 @@
+import{B as t}from"./index-Dx2rPdPi.js";import{d as r,_ as s,a9 as o,aa as e,G as n,ad as c,u as i,a0 as _}from"./vue-CcYFxcV9.js";const l=_("p",{class:"h-20"},"Content Message",-1),f=r({__name:"Drawer5",setup(p){return(a,m)=>(s(),o(i(t),c(a.$attrs,{isDetail:!0,title:"Drawer Title5"}),{titleToolbar:e(()=>[n(" toolbar ")]),default:e(()=>[l]),_:1},16))}});export{f as _};

@@ -1,0 +1,1 @@
+import{_ as e}from"./entry/index-DAalq45t.js";import{_ as t,$ as c}from"./vue-CcYFxcV9.js";import"./antd-Dz9J5sbH.js";const o={},n={class:"tenant-main"};function a(r,s){return t(),c("div",n," 租户 ")}const f=e(o,[["render",a],["__scopeId","data-v-b2fc9a2b"]]);export{f as default};

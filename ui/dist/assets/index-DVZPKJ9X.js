@@ -1,0 +1,1 @@
+import{_ as e}from"./entry/index-DAalq45t.js";import{_ as c,$ as t}from"./vue-CcYFxcV9.js";import"./antd-Dz9J5sbH.js";const o={},s={class:"suite-main"};function r(_,n){return c(),t("div",s," 测试套件 ")}const m=e(o,[["render",r],["__scopeId","data-v-e24cc9d4"]]);export{m as default};
