@@ -1,0 +1,38 @@
+name: aibot deploy
+
+on:
+  workflow_dispatch
+  # pull_request:
+  #   branches: [ "main" ]
+  # push:
+  #   branches: [ "main" ]
+
+jobs:
+  build-and-deploy:
+    runs-on: nancal
+    defaults:
+      run:
+        working-directory: ~/rd/project/deeptest-next
+    steps:
+      - name: checkout codes
+        run: git pull
+
+      - name: make server
+        run: ENV=dp make compile_server_linux
+
+      - name: make ui
+        run: make compile_ui
+
+      - name: copy files
+        run:  |
+          mkdir -p ~/rd/server-next
+          cp -f bin/linux/deeptest-server ~/rd/server-next/
+          
+          rm -rf ~/rd/server-next/deeptest-ui
+          cp -fr ui/dist ~/rd/server-next/deeptest-ui
+          
+      - name: start service
+        run:  |
+          ps -ef | grep 'deeptest-server-next' | grep -v grep | awk '{print $2}' | xargs --no-run-if-empty kill -9
+          cd ~/rd/server-next
+          RUNNER_TRACKING_ID="" && nohup ./deeptest-server > server.log 2>&1 &
