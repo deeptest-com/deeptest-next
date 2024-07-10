@@ -1,6 +1,0 @@
-
-> @vben/vite-config@1.0.0 stub /Users/aaron/rd/project/gudi/deeptest/ui/internal/vite-config
-> pnpm unbuild --stub
-
-ℹ Stubbing vite-config
-ℹ Cleaning dist directory: ./dist
