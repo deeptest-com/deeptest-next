@@ -3,7 +3,7 @@
 ui/internal/**/dist/
 **/node_modules/
 dist/
-ui/dist/
+/ui/dist/
 bin/
 /logs/
 /config/

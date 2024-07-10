@@ -1,1 +1,0 @@
-import{_ as e}from"./entry/index-DAalq45t.js";import{_ as o,$ as t}from"./vue-CcYFxcV9.js";import"./antd-Dz9J5sbH.js";const c={},r={class:"project-main"};function a(s,_){return o(),t("div",r," 项目 ")}const m=e(c,[["render",a],["__scopeId","data-v-a56e9a92"]]);export{m as default};
