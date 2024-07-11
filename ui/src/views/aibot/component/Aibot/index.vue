@@ -160,7 +160,7 @@ scroll()
 
 const isChatting = ref(false)
 const send = async () => {
-  console.log('send')
+  console.log('send ...')
   msg.value = msg.value.trim()
   if (!msg.value) return
 
@@ -171,10 +171,12 @@ const send = async () => {
 
   if (histories.value.length >= 30) histories.value = histories.value.splice(0,1)
 
-  if (''+msg.value !== wakeUpWord) {
-    histories.value.push(''+msg.value)
+  const userMsg = msg.value
+  if (''+userMsg !== wakeUpWord) {
+    histories.value.push(''+userMsg)
     historyIndex.value = histories.value.length
     setCache(CHAT_HISTORIES, histories.value)
+    msg.value = ''
   }
 
   isChatting.value = true
@@ -182,7 +184,7 @@ const send = async () => {
   const humanMsg = {
     type: 'human',
     name: humanName,
-    content: msg.value,
+    content: userMsg,
     avatar: humanAvatar,
   }
   messages.value.push(humanMsg)
@@ -200,11 +202,12 @@ const send = async () => {
     ],
     "model": props.llm,
     "tool_choice": "search_local_knowledgebase",
-    "tool_input": {"database": "wiki", "query": msg.value},
+    "tool_input": {"database": "wiki", "query": userMsg},
     "stream": true
   }
 
   isLoading.value = true
+
   await fetchEventSource(url, {
     method: 'POST',
     headers: {
@@ -226,65 +229,69 @@ const send = async () => {
     onmessage(msg: any) {
       console.log('onmessage', msg)
 
-      if (msg.data) {
-        let jsn = {} as any
-        try {
-          jsn = JSON.parse(msg.data)
-        } catch(err) {
-          console.log('parse chatchat msg failed', msg.data)
-          return
-        }
+      // return if no data
+      if (!msg.data)
+        return
 
-        const doc_contents = [] as any[]
-        let msg_content = ''
-
-        // docs
-        if (jsn.tool_output?.docs && jsn.tool_output?.docs.length > 0) {
-          jsn.tool_output?.docs.forEach((doc) => {
-            if (doc.page_content) {
-              let doc_content = getDocDesc(doc.page_content.trim())
-
-              const {pageId, pageType} = getDocLink(doc.metadata.source)
-              if (pageType === 'html') { // is link
-                doc_content =
-                  `[${doc_content}](${wikiAddress}/pages/viewpage.action?pageId=${pageId})`
-              }
-
-              doc_contents.push(doc_content)
-            }
-          })
-        }
-
-        // msgs
-        if (jsn.choices && jsn.choices.length > 0) {
-          jsn.choices?.forEach((choice) => {
-            if (choice.delta?.content && choice.delta?.content !== '__BREAK__') {
-              msg_content += choice.delta?.content?.trim()
-              msg_content = urlToLink(msg_content)
-            }
-          })
-        }
-
-        const robotMsg = {
-          type: 'robot',
-          name: humanName,
-          content: msg_content + '  \n\n' + (doc_contents.length > 0 ? '  \n出处：\n1. ' + doc_contents.join('  \n1.  ') : ''),
-          avatar: humanAvatar,
-        }
-        robotMsg.content = replaceLinkWithoutTitle(robotMsg.content)
-        console.log('!!!!!!', robotMsg)
-        messages.value.push(robotMsg )
-
-        scroll()
-        isLoading.value = false
+      let jsn = {} as any
+      try {
+        jsn = JSON.parse(msg.data)
+      } catch(err) {
+        console.log('parse chatchat msg failed', msg.data)
+        return
       }
+
+      // return if being __BREAK__ msg
+      if (jsn.choices && jsn.choices.length > 0 && jsn.choices[0].delta?.content === '__BREAK__')
+        return
+
+      const doc_contents = [] as any[]
+      let msg_content = ''
+
+      // docs
+      if (jsn.tool_output?.docs && jsn.tool_output?.docs.length > 0) {
+        jsn.tool_output?.docs.forEach((doc) => {
+          if (doc.page_content) {
+            let doc_content = getDocDesc(doc.page_content.trim())
+
+            const {pageId, pageType} = getDocLink(doc.metadata.source)
+            if (pageType === 'html') { // is link
+              doc_content =
+                `[${doc_content}](${wikiAddress}/pages/viewpage.action?pageId=${pageId})`
+            }
+
+            doc_contents.push(doc_content)
+          }
+        })
+      }
+
+      // msgs
+      if (jsn.choices && jsn.choices.length > 0) {
+        jsn.choices?.forEach((choice) => {
+          if (choice.delta?.content && choice.delta?.content !== '__BREAK__') {
+            msg_content += choice.delta?.content?.trim()
+            msg_content = urlToLink(msg_content)
+          }
+        })
+      }
+
+      const robotMsg = {
+        type: 'robot',
+        name: humanName,
+        content: msg_content + '  \n\n' + (doc_contents.length > 0 ? '  \n出处：\n1. ' + doc_contents.join('  \n1.  ') : ''),
+        avatar: humanAvatar,
+      }
+      robotMsg.content = replaceLinkWithoutTitle(robotMsg.content)
+      console.log('!!!!!!', robotMsg)
+      messages.value.push(robotMsg )
+
+      scroll()
+      isLoading.value = false
     },
 
     onclose() {
       console.log('onclose')
       isChatting.value = false
-
-      msg.value = ''
     },
     onerror(err) {
       console.log('onerror', err)
@@ -337,7 +344,7 @@ const keyDown = (event) => {
 }
 
 const initAiData = async () => {
-  const serverUrl = addSepIfNeeded(props.serverUrl) + 'api/v1'
+  const serverUrl = addSepIfNeeded(props.serverUrl)
 
   const kbsResp = await list_knowledge_bases(serverUrl)
   console.log('list_knowledge_bases', kbsResp)

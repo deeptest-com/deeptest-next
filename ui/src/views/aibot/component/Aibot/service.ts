@@ -89,8 +89,6 @@ export function replaceLinkWithoutTitle (str) {
 
     // str = str.replace(/([^\]])\((http.+?)\)/g, '$1<a href="$2" target="_blank">$2</a>')
 
-    console.log(str)
-
     return str
   } catch(err) {
     console.log('replace error', err)
