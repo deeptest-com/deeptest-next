@@ -29,7 +29,7 @@ var CONFIG = Web{
 	System: System{
 		Tls:        false,
 		Level:      "debug",
-		Addr:       "127.0.0.1:9085",
+		Addr:       "0.0.0.0:9085",
 		DbType:     "mysql",
 		TimeFormat: "2006-01-02 15:04:05",
 
@@ -96,7 +96,7 @@ type System struct {
 // SetDefaultAddrAndTimeFormat
 func SetDefaultAddrAndTimeFormat() {
 	if CONFIG.System.Addr == "" {
-		CONFIG.System.Addr = "127.0.0.1:9085"
+		CONFIG.System.Addr = "0.0.0.0:9085"
 	}
 
 	if CONFIG.System.TimeFormat == "" {

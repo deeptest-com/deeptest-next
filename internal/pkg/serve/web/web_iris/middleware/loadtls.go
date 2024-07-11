@@ -9,7 +9,7 @@ import (
 func LoadTls() iris.Handler {
 	middleware := secure.New(secure.Options{
 		SSLRedirect: true,
-		SSLHost:     "127.0.0.1:443",
+		SSLHost:     "0.0.0.0:443",
 	})
 	return middleware.Handler
 }

@@ -15,7 +15,7 @@ func TestStart(t *testing.T) {
 	defer zap_server.Remove()
 	defer web.Remove()
 	defer database.Remove()
-	web.CONFIG.System.Addr = "127.0.0.1:18088"
+	web.CONFIG.System.Addr = "0.0.0.0:18088"
 	go func() {
 		web.Start(Init())
 	}()
