@@ -53,7 +53,7 @@ func (s *AibotService) KnowledgeBaseChat(req v1.KnowledgeBaseChatReq, flusher ht
 	request.Header.Set("Cache-Control", "no-cache")
 	request.Header.Set("Accept", "text/event-stream")
 	request.Header.Set("Content-Type", "application/json")
-	//request.Header.Set("Connection", "keep-alive")
+	request.Header.Set("Connection", "keep-alive")
 
 	client := &http.Client{}
 	transport := &http.Transport{}
@@ -64,8 +64,6 @@ func (s *AibotService) KnowledgeBaseChat(req v1.KnowledgeBaseChatReq, flusher ht
 	if err != nil {
 		return
 	}
-
-	gotResp := false
 
 	r := bufio.NewReader(resp.Body)
 	defer resp.Body.Close()
@@ -78,10 +76,6 @@ func (s *AibotService) KnowledgeBaseChat(req v1.KnowledgeBaseChatReq, flusher ht
 			return
 		}
 
-		if strings.Index(str, "data:") == 0 {
-			gotResp = true
-		}
-
 		fmt.Println("\n>>>" + str + "\n")
 
 		// must with prefix "data:" which is from openai response msg,
@@ -89,12 +83,8 @@ func (s *AibotService) KnowledgeBaseChat(req v1.KnowledgeBaseChatReq, flusher ht
 		ctx.Writef("%s\n\n", str)
 		flusher.Flush()
 
-		if err1 == io.EOF || (gotResp && strings.Index(str, ": ping") == 0) {
-			str := s.genResp("__BREAK__")
-
-			ctx.Writef("%s\n\n", str)
-			flusher.Flush()
-			return
+		if strings.Index(str, "data:") == 0 {
+			break
 		}
 	}
 
