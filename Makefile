@@ -48,31 +48,31 @@ gen_version_file:
 	@echo '{"version": "${VERSION}"}' > ${QINIU_DIR}/${PROJECT}/version.json
 
 compile_ui:
-	@cd ui && pnpm build --dest dist && cd ..
+	@cd ui && pnpm build && cd ..
 
 # server
 compile_server_win64:
 	@echo 'start compile win64'
 	@CGO_ENABLED=1 CC=x86_64-w64-mingw32-gcc CXX=x86_64-w64-mingw32-g++ GOOS=windows GOARCH=amd64 \
 		${BUILD_CMD_WIN} -x -v \
-		-o ${BIN_DIR}win64/${PROJECT}-server.exe ${SERVER_MAIN_FILE}
+		-o ${BIN_DIR}win64/${PROJECT}-server-next.exe ${SERVER_MAIN_FILE}
 
 compile_server_win32:
 	@echo 'start compile win32'
 	@CGO_ENABLED=1 CC=i686-w64-mingw32-gcc CXX=i686-w64-mingw32-g++ GOOS=windows GOARCH=386 \
 		${BUILD_CMD_WIN} -x -v \
-		-o ${BIN_DIR}win32/${PROJECT}-server.exe ${SERVER_MAIN_FILE}
+		-o ${BIN_DIR}win32/${PROJECT}-server-next.exe ${SERVER_MAIN_FILE}
 
 compile_server_linux:
 	@echo 'start compile linux'
 ifeq ($(PLATFORM),"mac")
 	@CGO_ENABLED=1 GOOS=linux GOARCH=amd64 CC=/usr/local/gcc-4.8.1-for-linux64/bin/x86_64-pc-linux-gcc CXX=/usr/local/gcc-4.8.1-for-linux64/bin/x86_64-pc-linux-g++ \
 		${BUILD_CMD_UNIX} \
-		-o ${BIN_DIR}linux/${PROJECT}-server ${SERVER_MAIN_FILE}
+		-o ${BIN_DIR}linux/${PROJECT}-server-next ${SERVER_MAIN_FILE}
 else
 	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 CC=gcc CXX=g++ \
 		${BUILD_CMD_UNIX} \
-		-o ${BIN_DIR}linux/${PROJECT}-server ${SERVER_MAIN_FILE}
+		-o ${BIN_DIR}linux/${PROJECT}-server-next ${SERVER_MAIN_FILE}
 endif
 
 compile_server_mac:
@@ -80,4 +80,4 @@ compile_server_mac:
 	@echo
 	@CGO_ENABLED=1 GOOS=darwin GOARCH=amd64 \
 		${BUILD_CMD_UNIX} \
-		-o ${BIN_DIR}darwin/${PROJECT}-server ${SERVER_MAIN_FILE}
+		-o ${BIN_DIR}darwin/${PROJECT}-server-next ${SERVER_MAIN_FILE}
