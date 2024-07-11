@@ -420,6 +420,14 @@ onBeforeUnmount(async () => {
   color: #1677ff;
 }
 .aibot-container {
+
+  .robot .content {
+    p {
+      margin-top: 0.3em !important;
+      margin-bottom: 0.3em !important;
+    }
+  }
+
   .actions {
     padding: 9px;
     text-align: right;
@@ -603,9 +611,8 @@ onBeforeUnmount(async () => {
           }
         }
         .content {
-          /*float: left;*/
           margin: 0 10px 10px 50px;
-          padding: 12px 10px 10px 0;
+          padding: 10px 12px 10px 0;
           border-radius: 7px;
           word-break: break-all;
         }
