@@ -125,7 +125,7 @@ const props = defineProps({
   },
   serverUrl: {
     type: String,
-    default: 'http://192.168.5.134:8085/',
+    default: 'http://127.0.0.1:9085/api/v1',
     required: true,
   },
 });
@@ -188,8 +188,8 @@ const send = async () => {
   messages.value.push(humanMsg)
   scroll()
 
-  const serverUrl = addSepIfNeeded(props.serverUrl) + 'api/v1'
-  const url = `${serverUrl}/aichat/knowledge_base_chat`
+  const serverUrl = addSepIfNeeded(props.serverUrl)
+  const url = `${serverUrl}aichat/knowledge_base_chat`
   console.log('chat', url)
 
   const ctrl = new AbortController();
