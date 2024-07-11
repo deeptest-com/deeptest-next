@@ -1,6 +1,6 @@
 <template>
   <div class="aibot-main">
-    <Aibot serverUrl="http://127.0.0.1:8085/" kb="wiki">
+    <Aibot :serverUrl="aibotServerUrl" defaultKb="wiki">
       <template #actions>
           <span class="icon-container" title="帮助">
             <span class="help icon dp-link"></span>
@@ -20,8 +20,10 @@
 </template>
 
 <script lang="ts" setup>
+import {ref} from "vue";
 import Aibot from "./component/Aibot/index.vue";
 
+const aibotServerUrl = ref(import.meta.env.VITE_GLOB_API_SERVER)
 
 </script>
 

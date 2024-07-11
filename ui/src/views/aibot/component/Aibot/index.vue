@@ -118,7 +118,7 @@ const props = defineProps({
     default: '', // will use the first llm in chatchat server if empty
     required: false,
   },
-  kb: {
+  defaultKb: {
     type: String,
     default: 'wiki',
     required: true,
@@ -140,7 +140,7 @@ const histories = ref([] as any[])
 const historyIndex = ref(-1)
 
 const aiKbs = ref([] as any[])
-const kb = ref(props.kb)
+const kb = ref(props.defaultKb)
 const msg = ref('')
 const isLoading = ref(false)
 
