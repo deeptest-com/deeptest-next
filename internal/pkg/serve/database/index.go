@@ -80,7 +80,7 @@ func gormSqlite() *gorm.DB {
 		return nil
 	}
 
-	conn := filepath.Join(consts.ExecDir, CONFIG_SQLITE.DbName+".db?cache=shared&mode=rwc&_journal_mode=WAL")
+	conn := filepath.Join(consts.ExecDir, CONFIG_SQLITE.DbName+".db") // ?cache=shared&mode=rwc&_journal_mode=WAL")
 	_logUtils.Infof(conn)
 	dialector := sqlite.Open(conn)
 
