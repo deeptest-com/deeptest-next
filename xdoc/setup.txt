@@ -4,3 +4,5 @@ chatchat-config server --default_bind_host=0.0.0.0
 chatchat -a
 
 git push -f github main:main
+
+nohup ./run.sh > runner.log 2>&1 &
