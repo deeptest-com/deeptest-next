@@ -87,6 +87,10 @@ export function replaceLinkWithoutTitle (str) {
     str = str.replace(/\[(\d+)-([^\]]+)\]\([^)]+\.html\)[\d\D]/g,
       '[$2](https://wiki.nancalcloud.com/pages/viewpage.action?pageId=$1)')
 
+    // ABC (/pages/diffpagesbyversion.action?pageId=5969977&selectedPageVersions=1&selectedPageVersions=2) 123
+    str = str.replace(/([^\]])\((\/pages\/.+?\.action\?pageId=.+?)\)/g, '$1[链接](https://wiki.nancalcloud.com$2)')
+
+    // change markdown link to html link.
     // str = str.replace(/([^\]])\((http.+?)\)/g, '$1<a href="$2" target="_blank">$2</a>')
 
     return str
