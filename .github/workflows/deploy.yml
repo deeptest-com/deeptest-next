@@ -29,7 +29,7 @@ jobs:
       - name: copy files
         run:  |
           mkdir -p /home/nancal/rd/server-next
-          cp -f bin/linux/deeptest-server /home/nancal/rd/server-next/
+          cp -f bin/linux/deeptest-server-next /home/nancal/rd/server-next/
           
           rm -rf /home/nancal/rd/server-next/deeptest-ui
           cp -fr ui/dist /home/nancal/rd/server-next/deeptest-ui
@@ -38,4 +38,4 @@ jobs:
         run:  |
           ps -ef | grep 'deeptest-server-next' | grep -v grep | awk '{print $2}' | xargs --no-run-if-empty kill -9
           cd /home/nancal/rd/server-next
-          RUNNER_TRACKING_ID="" && nohup ./deeptest-server -d sqlite > server.log 2>&1 &
+          RUNNER_TRACKING_ID="" && nohup ./deeptest-server-next -d sqlite > server.log 2>&1 &
