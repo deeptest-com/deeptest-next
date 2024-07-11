@@ -21,10 +21,12 @@ func GetExecDir() (ret string) {
 	}
 
 	if strings.Index(strings.ToLower(exePath), "goland") > -1 { // idea debug
-		exePath, _ = os.Getwd()
+		ret, _ = os.Getwd()
+	} else {
+		ret = filepath.Dir(exePath)
 	}
 
-	ret = AddSepIfNeeded(exePath)
+	ret = AddSepIfNeeded(ret)
 
 	return
 }
