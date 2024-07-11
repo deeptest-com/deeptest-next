@@ -607,6 +607,7 @@ onBeforeUnmount(async () => {
           margin: 0 10px 10px 50px;
           padding: 12px 10px 10px 0;
           border-radius: 7px;
+          word-break: break-all;
         }
 
         .toolbar {
