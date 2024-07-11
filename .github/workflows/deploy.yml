@@ -33,9 +33,9 @@ jobs:
           
           rm -rf /home/nancal/rd/server-next/deeptest-ui
           cp -fr ui/dist /home/nancal/rd/server-next/deeptest-ui
-          
+
       - name: start service
         run:  |
           ps -ef | grep 'deeptest-server-next' | grep -v grep | awk '{print $2}' | xargs --no-run-if-empty kill -9
           cd /home/nancal/rd/server-next
-          RUNNER_TRACKING_ID="" && nohup ./deeptest-server > server.log 2>&1 &
+          RUNNER_TRACKING_ID="" && nohup ./deeptest-server -d sqlite > server.log 2>&1 &
