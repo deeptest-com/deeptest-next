@@ -196,22 +196,31 @@ const send = async () => {
   const ctrl = new AbortController();
 
   const data = {
+    "model": "glm4-chat",
     "messages": [
-      {"role": "user", "content": "请使用markdown格式返回结果"}
+      {"role": "user", "content": "你好"},
+      {"role": "assistant", "content": "你好，我是人工智能大模型"},
+      {"role": "user", "content": "提取器怎么用？"},
     ],
-    "model": props.llm,
-    "tool_choice": "search_local_knowledgebase",
-    "tool_input": {"database": "wiki", "query": userMsg},
-    "stream": true
+    "stream": true,
+    "temperature": 0.7,
+    "extra_body": {
+      "top_k": 3,
+      "score_threshold": 2.0,
+      "return_direct": false,
+    },
+    "kb_name": kb.value,
   }
 
   isLoading.value = true
 
   await fetchEventSource(url, {
     method: 'POST',
-    headers: {
-      // 'Content-Type': 'application/json',
-    },
+    mode: 'cors',
+    // headers: {
+    //   'Content-Type': 'application/json',
+    // },
+    // referrerPolicy: 'origin-when-cross-origin',
     body: JSON.stringify(data),
     signal: ctrl.signal,
 
@@ -222,6 +231,7 @@ const send = async () => {
         return
       } else {
         console.log('onopen error, response is ', response)
+        ctrl.abort()
       }
     },
 
@@ -237,6 +247,7 @@ const send = async () => {
         jsn = JSON.parse(msg.data)
       } catch(err) {
         console.log('parse chatchat msg failed', msg.data)
+        ctrl.abort()
         return
       }
 
@@ -290,10 +301,12 @@ const send = async () => {
     onclose() {
       console.log('onclose')
       isChatting.value = false
+      ctrl.abort()
     },
     onerror(err) {
       console.log('onerror', err)
       isChatting.value = false
+      ctrl.abort()
     }
   });
 }

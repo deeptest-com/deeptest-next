@@ -19,7 +19,7 @@ type AibotService struct {
 }
 
 func (s *AibotService) KnowledgeBaseChat(req v1.KnowledgeBaseChatReq, flusher http.Flusher, ctx iris.Context) (ret _domain.PageData, err error) {
-	if strings.TrimSpace(req.ToolInput.Query) == "小乐" {
+	if len(req.Messages) > 0 && strings.TrimSpace(req.Messages[len(req.Messages)-1].Content) == "小乐" {
 		str := s.genResp("您好，有什么可以帮助您的？")
 
 		ctx.Writef("%s\n\n", str)
@@ -43,7 +43,8 @@ func (s *AibotService) KnowledgeBaseChat(req v1.KnowledgeBaseChatReq, flusher ht
 		//}
 	}
 
-	url := _http.AddSepIfNeeded(web.CONFIG.System.ChatchatUrl) + "chat/chat/completions"
+	url := _http.AddSepIfNeeded(web.CONFIG.System.ChatchatUrl) +
+		fmt.Sprintf("knowledge_base/local_kb/%s/chat/completions", req.KbName)
 	bts, err := json.Marshal(req)
 
 	reader := bytes.NewReader(bts)
@@ -67,10 +68,11 @@ func (s *AibotService) KnowledgeBaseChat(req v1.KnowledgeBaseChatReq, flusher ht
 		return
 	}
 
+	req.KbName = ""
 	r := bufio.NewReader(resp.Body)
 	defer resp.Body.Close()
 	for {
-		bytes, err1 := io.ReadAll(r)
+		bytes, err1 := r.ReadSlice('\n')
 		str := string(bytes)
 
 		if err1 != nil && err1 != io.EOF && err1 != io.ErrUnexpectedEOF {
@@ -84,10 +86,6 @@ func (s *AibotService) KnowledgeBaseChat(req v1.KnowledgeBaseChatReq, flusher ht
 		// must add a postfix "\n\n"
 		ctx.Writef("%s\n\n", str)
 		flusher.Flush()
-
-		if strings.Index(str, "data:") == 0 {
-			break
-		}
 	}
 
 	return

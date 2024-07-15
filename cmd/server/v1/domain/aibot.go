@@ -1,17 +1,19 @@
 package v1
 
 type KnowledgeBaseChatReq struct {
+	KbName   string `json:"kb_name"`
+	Model    string `json:"model"`
 	Messages []struct {
 		Role    string `json:"role"`
 		Content string `json:"content"`
 	} `json:"messages"`
-	Model      string `json:"model"`
-	ToolChoice string `json:"tool_choice"`
-	ToolInput  struct {
-		Database string `json:"database"`
-		Query    string `json:"query"`
-	} `json:"tool_input"`
-	Stream bool `json:"stream"`
+	Stream      interface{} `json:"stream"`
+	Temperature float64     `json:"temperature"`
+	ExtraBody   struct {
+		TopK           int         `json:"top_k"`
+		ScoreThreshold float64     `json:"score_threshold"`
+		ReturnDirect   interface{} `json:"return_direct"`
+	} `json:"extra_body"`
 }
 
 type ChatchatModelReq struct {
