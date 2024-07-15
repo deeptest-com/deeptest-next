@@ -100,7 +100,6 @@ import Markdown from 'vue3-markdown-it';
 import {notifySuccess} from "@/utils/notify";
 import {getCache, setCache} from "@/utils/localCache";
 import {
-  urlToLink,
   scroll,
   setSelectionRange,
   list_knowledge_bases,
@@ -270,7 +269,6 @@ const send = async () => {
         jsn.choices?.forEach((choice) => {
           if (choice.delta?.content && choice.delta?.content !== '__BREAK__') {
             msg_content += choice.delta?.content?.trim()
-            msg_content = urlToLink(msg_content)
           }
         })
       }
@@ -278,7 +276,7 @@ const send = async () => {
       const robotMsg = {
         type: 'robot',
         name: humanName,
-        content: msg_content + '  \n\n' + (doc_contents.length > 0 ? '  \n出处：\n1. ' + doc_contents.join('  \n1.  ') : ''),
+        content: msg_content + '  \n\n' + (doc_contents.length > 0 ? '  \n出处：\n1. ' + doc_contents.join('  \n1. ') : ''),
         avatar: humanAvatar,
       }
       robotMsg.content = replaceLinkWithoutTitle(robotMsg.content)

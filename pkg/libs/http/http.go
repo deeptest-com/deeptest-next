@@ -24,7 +24,7 @@ func Get(url string) (ret []byte, err error) {
 	}
 
 	client := &http.Client{
-		Timeout: 3 * time.Second,
+		Timeout: 8 * time.Second,
 	}
 
 	req, err := http.NewRequest("GET", url, nil)

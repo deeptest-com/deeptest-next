@@ -28,17 +28,19 @@ func (s *AibotService) KnowledgeBaseChat(req v1.KnowledgeBaseChatReq, flusher ht
 	}
 
 	if strings.TrimSpace(req.Model) == "" {
-		models, _ := s.ListValidModel("llm")
+		req.Model = "glm4-chat"
 
-		if len(models) > 0 {
-			req.Model = models[0].ModelName
-		} else {
-			str := s.genResp("没有可使用的大模型，请联系管理员。")
-
-			ctx.Writef("%s\n\n", str)
-			flusher.Flush()
-			return
-		}
+		//models, _ := s.ListValidModel("llm")
+		//
+		//if len(models) > 0 {
+		//	req.Model = models[0].ModelName
+		//} else {
+		//	str := s.genResp("没有可使用的大模型，请联系管理员。")
+		//
+		//	ctx.Writef("%s\n\n", str)
+		//	flusher.Flush()
+		//	return
+		//}
 	}
 
 	url := _http.AddSepIfNeeded(web.CONFIG.System.ChatchatUrl) + "chat/chat/completions"
@@ -51,8 +53,8 @@ func (s *AibotService) KnowledgeBaseChat(req v1.KnowledgeBaseChatReq, flusher ht
 	}
 
 	request.Header.Set("Cache-Control", "no-cache")
-	request.Header.Set("Accept", "text/event-stream")
 	request.Header.Set("Content-Type", "application/json")
+	request.Header.Set("Accept", "text/event-stream")
 	request.Header.Set("Connection", "keep-alive")
 
 	client := &http.Client{}
@@ -68,10 +70,10 @@ func (s *AibotService) KnowledgeBaseChat(req v1.KnowledgeBaseChatReq, flusher ht
 	r := bufio.NewReader(resp.Body)
 	defer resp.Body.Close()
 	for {
-		line, err1 := r.ReadSlice('\n')
-		str := string(line)
+		bytes, err1 := io.ReadAll(r)
+		str := string(bytes)
 
-		if err1 != nil && err1 != io.EOF {
+		if err1 != nil && err1 != io.EOF && err1 != io.ErrUnexpectedEOF {
 			err = err1
 			return
 		}
