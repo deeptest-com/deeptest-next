@@ -42,8 +42,8 @@ export function getDocDesc(str) {
     return str
   }
 
-  const first = str.substring(0, 21);
-  const last = str.substring(str.length - 10);
+  const first = str.substring(0, 16);
+  const last = str.substring(str.length - 8);
 
   return first + ' ... ' + last
 }
