@@ -24,19 +24,6 @@ export function scroll() {
     }, 200)
 }
 
-export function isUnderRobotMsg(elem) {
-  const parent = elem.parentNode
-  if (!parent) {
-    return false
-  }
-
-  if (parent.classList.contains('markdown-container')) {
-    return true
-  }
-
-  return isUnderRobotMsg(parent)
-}
-
 export function getDocDesc(str) {
   if (str.length < 30) {
     return str
@@ -46,6 +33,19 @@ export function getDocDesc(str) {
   const last = str.substring(str.length - 8);
 
   return first + ' ... ' + last
+}
+
+export function getDocLink (source): any {
+  // docs/15010286-乐研API - 20231215 - 乐研文档中心 - 技术平台知识库.html
+
+  const regex = /.+?(\d+)-(.+?)-.*\.(html)/g;
+
+  const matches = regex.exec(source);
+  if (matches && matches.length > 3) {
+    return {pageId: matches[1], pageTitle: matches[2].trim(), pageType: matches[3].trim()}
+  }
+
+  return {}
 }
 
 export function replaceLinkWithoutTitle (str) {
@@ -68,17 +68,16 @@ export function replaceLinkWithoutTitle (str) {
   }
 }
 
-export function getDocLink (source): any {
-  // docs/15010286-乐研API - 20231215 - 乐研文档中心 - 技术平台知识库.html
+export const getLatestRobotMsg = function (msgs) {
+  if (msgs.length === 0) return -1
 
-  const regex = /.+?(\d+)-.*\.(html)/g;
-
-  const matches = regex.exec(source);
-  if (matches && matches.length > 2) {
-    return {pageId: matches[1], pageType: matches[2]}
+  for (let i = msgs.length - 1; i >= 0; i--) {
+    if (msgs[i].type === 'robot') {
+      return i
+    }
   }
 
-  return {}
+  return -1
 }
 
 export const setSelectionRange = function (ctrl, pos) {
@@ -96,4 +95,17 @@ export const setSelectionRange = function (ctrl, pos) {
             range.select()
         }
     }, 100)
+}
+
+export function isUnderRobotMsg(elem) {
+  const parent = elem.parentNode
+  if (!parent) {
+    return false
+  }
+
+  if (parent.classList.contains('markdown-container')) {
+    return true
+  }
+
+  return isUnderRobotMsg(parent)
 }

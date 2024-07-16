@@ -72,12 +72,15 @@ func (s *AibotService) KnowledgeBaseChat(req v1.KnowledgeBaseChatReq, flusher ht
 	r := bufio.NewReader(resp.Body)
 	defer resp.Body.Close()
 	for {
-		bytes, err1 := r.ReadSlice('\n')
+		bytes, err1 := r.ReadBytes('\n')
 		str := string(bytes)
 
-		if err1 != nil && err1 != io.EOF && err1 != io.ErrUnexpectedEOF {
+		if err1 != nil && err1 != io.EOF {
 			err = err1
 			return
+		}
+		if err1 == io.EOF {
+			break
 		}
 
 		fmt.Println("\n>>>" + str + "\n")

@@ -43,8 +43,7 @@
 
               <span>{{item.doc}}</span>
 
-              <span v-if="index === messages.length - 1"
-                    class="loading">
+              <span v-if="isChatting" class="loading">
                 <img src="@/assets/images/chat-loading.gif" />
               </span>
             </div>
@@ -56,7 +55,7 @@
             </div>
 
             <div class="content markdown-container">
-              <Markdown :source="item.content" :linkify="true" :html="true" />
+              <Markdown :source="item.docs + '\n\n' + item.content" :linkify="true" :html="true" />
             </div>
             <div class="toolbar">
               <div class="call dp-link-primary"
@@ -80,9 +79,9 @@
                @keydown="keyDown"
                @keyup.enter="send" />
 
-        <span v-if="!isLoading" class="button dp-link"
+        <span v-if="!isChatting" class="button dp-link"
               @click="send" />
-        <span v-if="isLoading" class="button" />
+        <span v-if="isChatting" class="button" />
       </div>
 
       <div class="actions">
@@ -106,7 +105,7 @@ import {
   getDocLink,
   getDocDesc,
   replaceLinkWithoutTitle,
-  isUnderRobotMsg
+  isUnderRobotMsg, getLatestRobotMsg
 } from "./service";
 import consts from "@/config/constant";
 import {addSepIfNeeded} from "@/utils/http/url";
@@ -141,7 +140,8 @@ const historyIndex = ref(-1)
 const aiKbs = ref([] as any[])
 const kb = ref(props.defaultKb)
 const msg = ref('')
-const isLoading = ref(false)
+const isChatting = ref(false)
+const continueOnCurrMsg = ref(false)
 
 const messages = ref([] as any[])
 messages.value.push({
@@ -154,10 +154,10 @@ messages.value.push({
   type: 'robot',
   name: 'ChatGPT',
   content: '您好，有什么可以帮助您的？',
+  docs: ''
 })
 scroll()
 
-const isChatting = ref(false)
 const send = async () => {
   console.log('send ...')
   msg.value = msg.value.trim()
@@ -200,7 +200,7 @@ const send = async () => {
     "messages": [
       {"role": "user", "content": "你好"},
       {"role": "assistant", "content": "你好，我是人工智能大模型"},
-      {"role": "user", "content": "提取器怎么用？"},
+      {"role": "user", "content": userMsg},
     ],
     "stream": true,
     "temperature": 0.7,
@@ -212,7 +212,7 @@ const send = async () => {
     "kb_name": kb.value,
   }
 
-  isLoading.value = true
+  isChatting.value = true
 
   await fetchEventSource(url, {
     method: 'POST',
@@ -220,7 +220,6 @@ const send = async () => {
     // headers: {
     //   'Content-Type': 'application/json',
     // },
-    // referrerPolicy: 'origin-when-cross-origin',
     body: JSON.stringify(data),
     signal: ctrl.signal,
 
@@ -258,25 +257,20 @@ const send = async () => {
       const doc_contents = [] as any[]
       let msg_content = ''
 
-      // docs
-      if (jsn.tool_output?.docs && jsn.tool_output?.docs.length > 0) {
-        jsn.tool_output?.docs.forEach((doc) => {
-          if (doc.page_content) {
-            let doc_content = getDocDesc(doc.page_content.trim())
+      // parse msg
+      if (jsn.docs && jsn.docs.length > 0) { // docs
+        const docMap = {}
 
-            const {pageId, pageType} = getDocLink(doc.metadata.source)
-            if (pageType === 'html') { // is link
-              doc_content =
-                `[${doc_content}](${wikiAddress}/pages/viewpage.action?pageId=${pageId})`
-            }
+        jsn.docs.forEach((doc) => {
+          const {pageId, pageTitle, pageType} = getDocLink(doc.trim())
+          if (!docMap[pageId] && pageType === 'html') { // is link
+            const doc_content = `[${pageTitle}](${wikiAddress}/pages/viewpage.action?pageId=${pageId})`
 
             doc_contents.push(doc_content)
+            docMap[pageId] = true
           }
         })
-      }
-
-      // msgs
-      if (jsn.choices && jsn.choices.length > 0) {
+      } else if (jsn.choices && jsn.choices.length > 0) { // msg
         jsn.choices?.forEach((choice) => {
           if (choice.delta?.content && choice.delta?.content !== '__BREAK__') {
             msg_content += choice.delta?.content?.trim()
@@ -284,28 +278,53 @@ const send = async () => {
         })
       }
 
-      const robotMsg = {
-        type: 'robot',
-        name: humanName,
-        content: msg_content + '  \n\n' + (doc_contents.length > 0 ? '  \n出处：\n1. ' + doc_contents.join('  \n1. ') : ''),
-        avatar: humanAvatar,
+      // generate msg
+      let docs = ''
+      let content = ''
+      if (doc_contents.length > 0) {
+        docs = '  \n参考资料：\n1. ' + doc_contents.join('  \n1. ')
+      } else if (msg_content.length > 0) {
+        content = `${msg_content}`
       }
-      robotMsg.content = replaceLinkWithoutTitle(robotMsg.content)
-      console.log('!!!!!!', robotMsg)
-      messages.value.push(robotMsg )
+
+      // create/update robot msg
+      if (!continueOnCurrMsg.value) {
+        const currRobotMsg = {
+          type: 'robot',
+          name: humanName,
+          avatar: humanAvatar,
+          docs: docs.length > 0 ? replaceLinkWithoutTitle(docs) : '',
+          content: content.length > 0 ? content : ''
+        }
+        // console.log('!!!!!!', currRobotMsg)
+        messages.value.push(currRobotMsg)
+
+        continueOnCurrMsg.value = true
+
+      } else {
+        const index = getLatestRobotMsg(messages.value)
+        if (index >= 0) {
+          if (docs.length > 0)
+            messages.value[index].docs = replaceLinkWithoutTitle(messages.value[index].docs + docs)
+
+          if (content.length > 0)
+            messages.value[index].content = replaceLinkWithoutTitle(messages.value[index].content + content)
+        }
+      }
 
       scroll()
-      isLoading.value = false
     },
 
     onclose() {
       console.log('onclose')
       isChatting.value = false
+      continueOnCurrMsg.value = false
       ctrl.abort()
     },
     onerror(err) {
       console.log('onerror', err)
       isChatting.value = false
+      continueOnCurrMsg.value = false
       ctrl.abort()
     }
   });

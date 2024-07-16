@@ -1,7 +1,7 @@
 package v1
 
 type KnowledgeBaseChatReq struct {
-	KbName   string `json:"kb_name"`
+	KbName   string `json:"kb_name,omitempty"`
 	Model    string `json:"model"`
 	Messages []struct {
 		Role    string `json:"role"`
