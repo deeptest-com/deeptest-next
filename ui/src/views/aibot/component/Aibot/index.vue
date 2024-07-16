@@ -43,7 +43,7 @@
 
               <span>{{item.doc}}</span>
 
-              <span v-if="isChatting" class="loading">
+              <span v-if="isChatting && index === messages.length - 1" class="loading">
                 <img src="@/assets/images/chat-loading.gif" />
               </span>
             </div>
