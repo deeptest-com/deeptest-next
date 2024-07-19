@@ -179,6 +179,7 @@ const send = async () => {
   }
 
   isChatting.value = true
+  continueOnCurrMsg.value = false
 
   const humanMsg = {
     type: 'human',
@@ -212,6 +213,7 @@ const send = async () => {
     "kb_name": kb.value,
   }
 
+  ctrl.abort()
   isChatting.value = true
 
   await fetchEventSource(url, {
@@ -235,11 +237,10 @@ const send = async () => {
     },
 
     onmessage(msg: any) {
-      console.log('onmessage', msg)
-
       // return if no data
-      if (!msg.data)
-        return
+      if (!msg.data) return
+
+      console.log('onmessage', msg)
 
       let jsn = {} as any
       try {
