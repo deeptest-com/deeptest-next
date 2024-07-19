@@ -58,9 +58,9 @@
               <Markdown :source="item.docs + '\n\n' + item.content" :linkify="true" :html="true" />
             </div>
             <div class="toolbar">
-              <div class="call dp-link-primary"
-                   @click="recall(index)">
-                重新生成
+              <div class="call">
+                <span class="dp-link-primary"
+                      @click="recall(index)">重新生成</span>
               </div>
 
               <div class="copy dp-link"
