@@ -251,10 +251,6 @@ const send = async () => {
         return
       }
 
-      // return if being __BREAK__ msg
-      if (jsn.choices && jsn.choices.length > 0 && jsn.choices[0].delta?.content === '__BREAK__')
-        return
-
       const doc_contents = [] as any[]
       let msg_content = ''
 
@@ -326,7 +322,9 @@ const send = async () => {
       console.log('onerror', err)
       isChatting.value = false
       continueOnCurrMsg.value = false
-      ctrl.abort()
+
+      throw err
+      // ctrl.abort()
     }
   });
 }
