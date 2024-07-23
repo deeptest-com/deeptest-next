@@ -55,7 +55,7 @@
             </div>
 
             <div class="content markdown-container">
-              <Markdown :source="item.docs + '\n\n' + item.content" :linkify="true" :html="true" />
+              <Markdown :source="item.docs + '\n\n' + item.content" :linkify="true" :html="false" />
             </div>
             <div class="toolbar">
               <div class="call">
@@ -142,6 +142,9 @@ const kb = ref(props.defaultKb)
 const msg = ref('')
 const isChatting = ref(false)
 const continueOnCurrMsg = ref(false)
+
+const mm = `提取器用于将请求响应结果中的数据经过解析后提取出来，并存储在变量中，用于结果的校验或传递给下个请求调用等进一步操作。使用方法如下：1.响应头参数值提取：直接从响应头中提取所需参数值。2.响应体内容提取：-使用Xpath对响应体进行解析。-本系统使用jsonquery工具进行解析。-Xpath语法详见：https://github.com/antchfx/jsonquery示例XPath写法：\`\`\`xml<response-body><example><data>所需数据</data></example></response-body>\`\`\`XPath表达式可能如下：\`\`\`xpath/response-body/example/data\`\`\`请注意，具体的XPath表达式需要根据实际的响应体结构进行调整。
+dom.ts:10 606`
 
 const messages = ref([] as any[])
 messages.value.push({
@@ -269,7 +272,7 @@ const send = async () => {
       } else if (jsn.choices && jsn.choices.length > 0) { // msg
         jsn.choices?.forEach((choice) => {
           if (choice.delta?.content && choice.delta?.content !== '__BREAK__') {
-            msg_content += choice.delta?.content?.trim()
+            msg_content += choice.delta?.content
           }
         })
       }
