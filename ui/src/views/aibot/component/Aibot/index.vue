@@ -229,7 +229,7 @@ const send = async () => {
     async onopen(response) {
       console.log('onopen', response)
 
-      if (response.ok && response.headers.get('content-type') === EventStreamContentType) {
+      if (response.ok) {
         return
       } else {
         throw new FetchError()
@@ -284,7 +284,7 @@ const send = async () => {
       }
 
       // create/update robot msg
-      if (!continueOnCurrMsg.value) {
+      if (!continueOnCurrMsg.value) { // create
         const currRobotMsg = {
           type: 'robot',
           name: humanName,
@@ -297,7 +297,7 @@ const send = async () => {
 
         continueOnCurrMsg.value = true
 
-      } else {
+      } else { // append
         const index = getLatestRobotMsg(messages.value)
         if (index >= 0) {
           if (docs.length > 0)
@@ -312,7 +312,7 @@ const send = async () => {
     },
 
     onclose() {
-      console.log('onclose')
+      console.log('onclose', messages.value.length > 0 ? messages.value[messages.value.length - 1].content : 'empty')
       isChatting.value = false
       continueOnCurrMsg.value = false
       ctrl.abort()
