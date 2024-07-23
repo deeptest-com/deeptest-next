@@ -93,7 +93,7 @@
 
 <script setup lang="ts">
 import {onMounted, onBeforeUnmount, ref} from "vue";
-import {fetchEventSource} from '@microsoft/fetch-event-source';
+import {EventStreamContentType, fetchEventSource} from '@microsoft/fetch-event-source';
 import MarkdownItStrikethroughAlt from 'markdown-it-strikethrough-alt';
 import Markdown from 'vue3-markdown-it';
 import {notifySuccess} from "@/utils/notify";
@@ -213,26 +213,26 @@ const send = async () => {
     "kb_name": kb.value,
   }
 
-  ctrl.abort()
   isChatting.value = true
+  ctrl.abort()
+  class FetchError extends Error { }
 
   await fetchEventSource(url, {
     method: 'POST',
-    mode: 'cors',
-    // headers: {
-    //   'Content-Type': 'application/json',
-    // },
+    headers: {
+      'Content-Type': 'application/json',
+    },
     body: JSON.stringify(data),
+    mode: 'cors',
     signal: ctrl.signal,
 
     async onopen(response) {
       console.log('onopen', response)
 
-      if (response.ok) { // && response.headers.get('content-type') === EventStreamContentType) {
+      if (response.ok && response.headers.get('content-type') === EventStreamContentType) {
         return
       } else {
-        console.log('onopen error, response is ', response)
-        ctrl.abort()
+        throw new FetchError()
       }
     },
 
@@ -247,8 +247,7 @@ const send = async () => {
         jsn = JSON.parse(msg.data)
       } catch(err) {
         console.log('parse chatchat msg failed', msg.data)
-        ctrl.abort()
-        return
+        throw new FetchError()
       }
 
       const doc_contents = [] as any[]
@@ -323,8 +322,8 @@ const send = async () => {
       isChatting.value = false
       continueOnCurrMsg.value = false
 
-      throw err
-      // ctrl.abort()
+      ctrl.abort()
+      throw err // rethrow to stop retries
     }
   });
 }
