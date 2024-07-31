@@ -86,7 +86,7 @@ func (s *AibotService) KnowledgeBaseChat(req v1.KnowledgeBaseChatReq, flusher ht
 
 		fmt.Println("\n>>>" + str + "\n")
 
-		// must with prefix "data:" which is from openai response msg,
+		// must with prefix "data:" for openai response
 		// must add a postfix "\n\n"
 		ctx.Writef("%s\n\n", str)
 		flusher.Flush()
